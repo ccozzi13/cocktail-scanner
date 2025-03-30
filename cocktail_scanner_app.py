@@ -17,14 +17,28 @@ st.title("Cocktail Scanner")
 st.write("Convert cocktail recipe text, images or cell phone snaps to BarAssistant import format.")
 
 st.header("Import Data", divider="blue")
-st.write("Where did you source this recipe?")
 
-source = st.text_input("Source", " ")
+st.write("Where did you source this recipe? Select and existing source, or enter a new one.")
 
-#col1, col2, col3 = st.columns(3)
+col_source1, col_source2 = st.columns(2)
+
+with col_source1:
+    sources = sorted(cocktail_scanner_parameters.common_sources)
+    source_select  = st.selectbox("Common sources", sources, index=None)
+
+with col_source2:
+    source_raw = st.text_input("Source", " ", key='source_raw')
+
+if source_select:
+    source = source_select
+else:
+    source = source_raw
+
+st.write(source)
+
 col1, col2 = st.columns(2)
 
-with col1:
+with col2:
     @st.dialog("Paste the text from a cocktail recipe", width="large")
     def cocktail_text():
         cocktail_text_submitted = st.text_area("Cocktail recipe", height=400, label_visibility="visible")
@@ -40,7 +54,7 @@ with col1:
             cocktail_text()
 
 
-with col2:
+with col1:
     uploaded_file = st.file_uploader(
         "Upload an image", accept_multiple_files=False, type=["jpg", "jpeg", "png", "heic"]
     )

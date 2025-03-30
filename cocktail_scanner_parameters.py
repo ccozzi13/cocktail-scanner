@@ -1,10 +1,10 @@
 schema_text_prompt = """These are the steps you should follow:
-                    1. Read an understand the JSON schema.
+                    1. Read and understand the JSON schema.
                     2. Read the provided recipe text and reformat it into this schema and return the JSON.
                     """
 
 schema_image_prompt = """These are the steps you should follow:
-                    1. Read an understand the JSON schema.
+                    1. Read and understand the JSON schema.
                     2. Look for the recipe text in the provided image and reformat it into this schema and return the JSON.
                     """
 
@@ -14,7 +14,7 @@ additional_prompts = """Here are additional notes to consider during your reform
                     3. Replace missing or null values for amount with 1.
                     4. Replace missing or null values for units with "units".
                     5. If juice ingredients have adjectives like "fresh", "strained", "squeezed" - do not include the adjectives.  For example "fresh lime juice" should be returned as "lime juice".
-                    6. If there are ingredients that have an additional recipes contained in this same text (sometimes included in Editor's Notes, or notated by 'see below'), include how to make this ingredient in the instructions field - along with the cocktail instructions.  The instructions field is one large text field, but try and format this nicely - and not completely merged with the description of the cocktail.  Perhaps separate with a string of 10 dashes with new lines above and below.  Remember that these instructions for extra ingredients my have ingredient lists as well.  Include them in the instructions field, no need to add them the main ingredients schema for the cocktail's ingredients.
+                    6. If there are ingredients that have an additional recipes contained in this same text (sometimes included in Editor's Notes, or notated by 'see below'), include how to make this ingredient in the instructions field - along with the cocktail instructions.  The instructions field is one large text field, but try and format this nicely - and not completely merged with the cocktail instructions.  Perhaps separate with a string of 10 dashes with new lines above and below.  Remember that these instructions for making some of the cocktail ingredients my have ingredient lists as well.  Include them in the instructions field, no need to add them the main ingredients schema for the cocktail's ingredients.
                     7. If the sources is not a URL or web link - and it is just simple text, also add it as a tag.  Keep the other tags.  Remember to also assign it to source AND tag.
                     """
 
@@ -24,6 +24,8 @@ recipe_prompt = """Here is the recipe text:
                 """
 
 default_model = 'gemini-2.0-flash'
+
+common_sources = ["Smuggler's Cove", "Death & Co.", "Tropical Standard", "Educated Barfly"]
 
 bar_assistant_schema = """{
     "$schema": "http://json-schema.org/draft-07/schema#",
