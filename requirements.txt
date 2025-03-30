@@ -1,4 +1,7 @@
 streamlit
 pandas
-google-genai
+google
 configparser
+heic2png
+Pillow
+pillow_heif

@@ -21,7 +21,8 @@ st.write("Where did you source this recipe?")
 
 source = st.text_input("Source", " ")
 
-col1, col2, col3 = st.columns(3)
+#col1, col2, col3 = st.columns(3)
+col1, col2 = st.columns(2)
 
 with col1:
     @st.dialog("Paste the text from a cocktail recipe", width="large")
@@ -39,34 +40,33 @@ with col1:
             cocktail_text()
 
 
-
 with col2:
-    @st.dialog("Upload an image")
-    def cocktail_image():
-        cocktail_image_submitted = st.text_input("Recipe text...")
-        if st.button("Submit",key='cocktail_image_submit'):
-            st.session_state.cocktail_image = {"cocktail_image": cocktail_image_submitted}
-            st.rerun()
+    uploaded_file = st.file_uploader(
+        "Upload an image", accept_multiple_files=False, type=["jpg", "jpeg", "png", "heic"]
+    )
+    if uploaded_file is not None:
+        if uploaded_file.type == 'application/octet-stream':
+            file_bytes = cocktail_scanner_ai.convert_heic_to_png(uploaded_file.getvalue())
+            file_type = 'image/png'
+        else:
+            file_bytes = uploaded_file.getvalue()
+            file_type = uploaded_file.type
+        st.session_state.cocktail_image = {"cocktail_image": file_bytes, "image_type": file_type}
+        #st.write(st.session_state.cocktail_image['image_type'])
 
-    if "cocktail_image" not in st.session_state:
-        if st.button("Upload an image",key='cocktail_image_no_image'):
-            cocktail_image()
-    else:
-        f"Text submitted"
+#with col3:
+#    @st.dialog("Paste the text from a cocktail recipe")
+#    def cocktail_camera():
+#        cocktail_camera_submitted = st.text_input("Recipe text...")
+#        if st.button("Submit",key='cocktail_camera_submit'):
+#            st.session_state.cocktail_camera = {"cocktail_camera": cocktail_camera_submitted}
+#            st.rerun()
 
-with col3:
-    @st.dialog("Paste the text from a cocktail recipe")
-    def cocktail_camera():
-        cocktail_camera_submitted = st.text_input("Recipe text...")
-        if st.button("Submit",key='cocktail_camera_submit'):
-            st.session_state.cocktail_camera = {"cocktail_camera": cocktail_camera_submitted}
-            st.rerun()
-
-    if "cocktail_camera" not in st.session_state:
-        if st.button("Take a photo",key='cocktail_camera_no_image'):
-            cocktail_camera()
-    else:
-        f"Text submitted"
+#    if "cocktail_camera" not in st.session_state:
+#        if st.button("Take a photo",key='cocktail_camera_no_image'):
+#            cocktail_camera()
+#    else:
+#        f"Text submitted"
 
 st.header("Review Data & Prompt", divider="blue")
 
@@ -76,18 +76,27 @@ with col4:
     if "cocktail_text" in st.session_state:
         st.write("Submitted text:")
         st.code(st.session_state.cocktail_text['submitted_text'], language=None, line_numbers=False, wrap_lines=True, height=250)
+    elif "cocktail_image" in st.session_state:
+        st.image(st.session_state.cocktail_image['cocktail_image'], caption="Submitted image")
     else:
         st.badge("No data submitted yet!", icon=":material/info:", color="blue")
 
 with col5:
     if "cocktail_text" in st.session_state:
         st.write("Submitted prompt:")
-        st.session_state.prompt = {"prompt": cocktail_scanner_ai.generate_full_text_prompt(cocktail_scanner_parameters.schema_prompt,
+        st.session_state.prompt = {"prompt": cocktail_scanner_ai.generate_full_text_prompt(cocktail_scanner_parameters.schema_text_prompt,
                                                           cocktail_scanner_parameters.additional_prompts,
                                                           cocktail_scanner_parameters.json_prompt,
                                                           cocktail_scanner_parameters.bar_assistant_schema,
                                                           cocktail_scanner_parameters.recipe_prompt,
                                                           st.session_state.cocktail_text['submitted_text']+"The source of this recipe was: "+source)}
+        st.code(st.session_state.prompt['prompt'], language=None, line_numbers=False, wrap_lines=True, height=250)
+    elif "cocktail_image" in st.session_state:
+        st.write("Submitted prompt:")
+        st.session_state.prompt = {"prompt": cocktail_scanner_ai.generate_image_prompt(cocktail_scanner_parameters.schema_image_prompt,
+                                                          cocktail_scanner_parameters.additional_prompts,
+                                                          cocktail_scanner_parameters.json_prompt,
+                                                          cocktail_scanner_parameters.bar_assistant_schema+"The source of this recipe was: "+source)}
         st.code(st.session_state.prompt['prompt'], language=None, line_numbers=False, wrap_lines=True, height=250)
     else:
         #st.badge("No data submitted yet!", icon=":material/info:", color="blue")
@@ -97,9 +106,13 @@ st.header("Model Output", divider="blue")
 
 with st.container(height=400, border=False):
     if "cocktail_text" in st.session_state:
-        if st.button("Submit prompt", key='submit_text_prompt'):
+        if st.button("Submit text prompt", key='submit_text_prompt'):
             google_key = cocktail_scanner_ai.get_google_api_key('local.ini', 'API', 'google_key')
             st.session_state.model_response = {"model_response": cocktail_scanner_ai.get_model_response(google_key, cocktail_scanner_parameters.default_model, st.session_state.prompt['prompt'])}
+    elif "cocktail_image" in st.session_state:
+        if st.button("Submit image prompt", key='submit_image_prompt'):
+            google_key = cocktail_scanner_ai.get_google_api_key('local.ini', 'API', 'google_key')
+            st.session_state.model_response = {"model_response": cocktail_scanner_ai.get_model_response_image(google_key, cocktail_scanner_parameters.default_model, st.session_state.prompt['prompt'],st.session_state.cocktail_image['cocktail_image'],st.session_state.cocktail_image['image_type'])}
 
     if "model_response" in st.session_state:
         st.write("Review and copy this JSON to BarAssistant:")
@@ -108,24 +121,7 @@ with st.container(height=400, border=False):
     else:
         st.badge("No data submitted yet!", icon=":material/info:", color="blue")
 
-with st.expander("Debugging data"):
-    st.code(cocktail_scanner_parameters.schema_prompt, height=200)
-    st.code(cocktail_scanner_parameters.additional_prompts, height=200)
-    st.code(cocktail_scanner_parameters.bar_assistant_schema, language="css", height=200)
-
-    #google_key = cocktail_scanner_api.get_google_api_key()
-
-    #if google_key:
-        # Generate the full prompt
-
-     #   print("Full prompt generated in the main script:")
-      #  print(prompt)
-
-        # Get the model response
-       # model_output = cocktail_scanner_api.get_model_response(google_key, prompt=prompt)
-
-        #if model_output:
-         #   print("Model output received in the main script:")
-            # Process the model_output as needed
-    #else:
-     #   print("Could not retrieve Google API key. Exiting.")
+#with st.expander("Debugging data"):
+    #st.code(cocktail_scanner_parameters.schema_prompt, height=200)
+    #st.code(cocktail_scanner_parameters.additional_prompts, height=200)
+    #st.code(cocktail_scanner_parameters.bar_assistant_schema, language="css", height=200)
