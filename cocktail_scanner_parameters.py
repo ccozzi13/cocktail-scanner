@@ -15,7 +15,8 @@ additional_prompts = """Here are additional notes to consider during your reform
                     4. Replace missing or null values for units with "units".
                     5. If juice ingredients have adjectives like "fresh", "strained", "squeezed" - do not include the adjectives.  For example "fresh lime juice" should be returned as "lime juice".
                     6. If there are ingredients that have an additional recipes contained in this same text (sometimes included in Editor's Notes, or notated by 'see below'), include how to make this ingredient in the instructions field - along with the cocktail instructions.  The instructions field is one large text field, but try and format this nicely - and not completely merged with the cocktail instructions.  Perhaps separate with a string of 10 dashes with new lines above and below.  Remember that these instructions for making some of the cocktail ingredients my have ingredient lists as well.  Include them in the instructions field, no need to add them the main ingredients schema for the cocktail's ingredients.
-                    7. If the sources is not a URL or web link - and it is just simple text, also add it as a tag.  Keep the other tags.  Remember to also assign it to source AND tag.
+                    7. Tags should be adjectives to describe the cocktail.  Like "tropical", "fruity", "smokey", "citrus".  They should not be bartender names or main ingredients.  They can descibe if the drink is a riff on a classic cocktail.  In that case the tag should start with 'Riff: '.  Like 'Riff: Margarita' or 'Riff: Zombie'.
+                    8. If the sources is not a URL or web link - and it is just simple text, also add it as a tag.  Keep the other tags.  Remember to also assign it to source AND tag.
                     """
 
 json_prompt =   """Here is the JSON schema:
@@ -25,7 +26,7 @@ recipe_prompt = """Here is the recipe text:
 
 default_model = 'gemini-2.0-flash'
 
-common_sources = ["Smuggler's Cove", "Death & Co.", "Tropical Standard", "Educated Barfly"]
+common_sources = ["Smuggler's Cove", "Death & Co.", "Tropical Standard", "Educated Barfly", "Reddit"]
 
 bar_assistant_schema = """{
     "$schema": "http://json-schema.org/draft-07/schema#",

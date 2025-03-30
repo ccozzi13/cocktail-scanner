@@ -1,6 +1,7 @@
 streamlit
 pandas
 google
+google-genai
 configparser
 heic2png
 Pillow
