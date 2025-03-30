@@ -19,7 +19,7 @@ st.write("Convert cocktail recipe text, images or cell phone snaps to BarAssista
 st.header("Import Data", divider="blue")
 st.write("Where did you source this recipe?")
 
-source = st.text_input("Source", "")
+source = st.text_input("Source", " ")
 
 col1, col2, col3 = st.columns(3)
 
