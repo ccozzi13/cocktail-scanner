@@ -35,10 +35,8 @@ json_prompt =   """Here is the JSON schema:
                 """
 recipe_prompt = """Here is the recipe text: 
                 """
-
 invent_prompt = """Here is the recipe description: 
                 """
-
 default_model = 'gemini-2.0-flash'
 
 all_models = ["gemini-2.0-flash", "gemini-2.5-pro-exp-03-25"]

@@ -93,6 +93,41 @@ if "cocktail_desc" in st.session_state:
 else:
     st.badge("No data submitted yet!", icon=":material/info:", color="blue")
 
+if "cocktail_text" in st.session_state:
+    #st.write("Submitted prompt:")
+    st.session_state.prompt = {"prompt": cocktail_scanner_ai.generate_full_text_prompt(cocktail_scanner_parameters.schema_text_prompt,
+                                                      cocktail_scanner_parameters.additional_prompts,
+                                                      cocktail_scanner_parameters.json_prompt,
+                                                      cocktail_scanner_parameters.bar_assistant_schema,
+                                                      cocktail_scanner_parameters.recipe_prompt,
+                                                      st.session_state.cocktail_text['submitted_text']+"The source of this recipe was: "+source)}
+    #st.code(st.session_state.prompt['prompt'], language=None, line_numbers=False, wrap_lines=True, height=250)
+elif "cocktail_image" in st.session_state:
+    #st.write("Submitted prompt:")
+    st.session_state.prompt = {"prompt": cocktail_scanner_ai.generate_image_prompt(cocktail_scanner_parameters.schema_image_prompt,
+                                                      cocktail_scanner_parameters.additional_prompts,
+                                                      cocktail_scanner_parameters.json_prompt,
+                                                      cocktail_scanner_parameters.bar_assistant_schema+"The source of this recipe was: "+source),
+                               "invent_prompt": cocktail_scanner_ai.generate_image_prompt(
+                                   cocktail_scanner_parameters.schema_invent_prompt,
+                                   cocktail_scanner_parameters.additional_prompts,
+                                   cocktail_scanner_parameters.json_prompt,
+                                   cocktail_scanner_parameters.bar_assistant_schema + "The source of this recipe was: " + source)
+                               }
+    #st.code(st.session_state.prompt['prompt'], language=None, line_numbers=False, wrap_lines=True, height=250)
+elif "cocktail_desc" in st.session_state:
+    #st.write("Submitted prompt:")
+    st.session_state.prompt = {"prompt": cocktail_scanner_ai.generate_full_text_prompt(cocktail_scanner_parameters.schema_invent_prompt,
+                                                      cocktail_scanner_parameters.additional_prompts,
+                                                      cocktail_scanner_parameters.json_prompt,
+                                                      cocktail_scanner_parameters.bar_assistant_schema,
+                                                      cocktail_scanner_parameters.invent_prompt,
+                                                      st.session_state.cocktail_desc['submitted_text']+"The source of this recipe was: "+source)}
+    #st.code(st.session_state.prompt['prompt'], language=None, line_numbers=False, wrap_lines=True, height=250)
+else:
+    #st.badge("No data submitted yet!", icon=":material/info:", color="blue")
+    pass
+
 st.header("Model Output", divider="blue")
 
 col_m, buff_m = st.columns([1, 5])
@@ -108,9 +143,12 @@ with st.container(height=400, border=False):
             google_key = cocktail_scanner_ai.get_google_api_key('local.ini', 'API', 'google_key')
             st.session_state.model_response = {"model_response": cocktail_scanner_ai.get_model_response(google_key, selected_model, st.session_state.prompt['prompt'])}
     elif "cocktail_image" in st.session_state:
-        if st.button("Submit an image", key='submit_image_prompt'):
+        if st.button("Submit an image recipe", key='submit_image_prompt'):
             google_key = cocktail_scanner_ai.get_google_api_key('local.ini', 'API', 'google_key')
             st.session_state.model_response = {"model_response": cocktail_scanner_ai.get_model_response_image(google_key, selected_model, st.session_state.prompt['prompt'],st.session_state.cocktail_image['cocktail_image'],st.session_state.cocktail_image['image_type'])}
+        if st.button("Submit an image description", key='submit_invent_image_prompt'):
+            google_key = cocktail_scanner_ai.get_google_api_key('local.ini', 'API', 'google_key')
+            st.session_state.model_response = {"model_response": cocktail_scanner_ai.get_model_response_image(google_key, selected_model, st.session_state.prompt['invent_prompt'],st.session_state.cocktail_image['cocktail_image'],st.session_state.cocktail_image['image_type'])}
     elif "cocktail_desc" in st.session_state:
         if st.button("Generate a recipe", key='submit_invent_text_prompt'):
             google_key = cocktail_scanner_ai.get_google_api_key('local.ini', 'API', 'google_key')
@@ -123,34 +161,5 @@ with st.container(height=400, border=False):
     else:
         st.badge("No data submitted yet!", icon=":material/info:", color="blue")
 
-with st.expander("Debugging data"):
-    if "cocktail_text" in st.session_state:
-        st.write("Submitted prompt:")
-        st.session_state.prompt = {"prompt": cocktail_scanner_ai.generate_full_text_prompt(cocktail_scanner_parameters.schema_text_prompt,
-                                                          cocktail_scanner_parameters.additional_prompts,
-                                                          cocktail_scanner_parameters.json_prompt,
-                                                          cocktail_scanner_parameters.bar_assistant_schema,
-                                                          cocktail_scanner_parameters.recipe_prompt,
-                                                          st.session_state.cocktail_text['submitted_text']+"The source of this recipe was: "+source)}
-        st.code(st.session_state.prompt['prompt'], language=None, line_numbers=False, wrap_lines=True, height=250)
-    elif "cocktail_image" in st.session_state:
-        st.write("Submitted prompt:")
-        st.session_state.prompt = {"prompt": cocktail_scanner_ai.generate_image_prompt(cocktail_scanner_parameters.schema_image_prompt,
-                                                          cocktail_scanner_parameters.additional_prompts,
-                                                          cocktail_scanner_parameters.json_prompt,
-                                                          cocktail_scanner_parameters.bar_assistant_schema+"The source of this recipe was: "+source)}
-        st.code(st.session_state.prompt['prompt'], language=None, line_numbers=False, wrap_lines=True, height=250)
-    elif "cocktail_desc" in st.session_state:
-        st.write("Submitted prompt:")
-        st.session_state.prompt = {"prompt": cocktail_scanner_ai.generate_full_text_prompt(cocktail_scanner_parameters.schema_invent_prompt,
-                                                          cocktail_scanner_parameters.additional_prompts,
-                                                          cocktail_scanner_parameters.json_prompt,
-                                                          cocktail_scanner_parameters.bar_assistant_schema,
-                                                          cocktail_scanner_parameters.invent_prompt,
-                                                          st.session_state.cocktail_desc['submitted_text']+"The source of this recipe was: "+source)}
-        st.code(st.session_state.prompt['prompt'], language=None, line_numbers=False, wrap_lines=True, height=250)
-    else:
-        #st.badge("No data submitted yet!", icon=":material/info:", color="blue")
-        pass
-
+#with st.expander("Debugging data"):
     #st.code(cocktail_scanner_parameters.bar_assistant_schema, language="css", height=200)
