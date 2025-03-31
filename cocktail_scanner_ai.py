@@ -23,6 +23,15 @@ def generate_full_text_prompt(schema_prompt, additional_prompts, json_prompt, ba
                    recipe_text)
     return full_prompt
 
+def generate_invent_text_prompt(schema_prompt, additional_prompts, json_prompt, bar_assistant_schema, invent_prompt, invent_text):
+    full_prompt = (schema_prompt +
+                   additional_prompts +
+                   json_prompt +
+                   bar_assistant_schema +
+                   invent_prompt +
+                   invent_text)
+    return full_prompt
+
 def generate_image_prompt(schema_prompt, additional_prompts, json_prompt, bar_assistant_schema):
     full_prompt = (schema_prompt +
                    additional_prompts +

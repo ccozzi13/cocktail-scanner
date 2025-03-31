@@ -8,6 +8,18 @@ schema_image_prompt = """These are the steps you should follow:
                     2. Look for the recipe text in the provided image and reformat it into this schema and return the JSON.
                     """
 
+schema_invent_prompt =  """These are the steps you should follow:
+                    1. Read and understand the JSON schema.
+                    2. This cocktail text describes it but does not have the exact recipe.  You should synthesize a potential recipe, including specific measurements for each ingredient and the recommended preparation method (e.g., shaking, stirring).
+                    3. If you can't find an exact recipe, search for cocktails that include similar ingredients.
+                    4. Investigate the typical ratios of these ingredients in cocktails, and considering the presence of other strong flavors.
+                    5. Instead of ML (millimeters) use ounces.
+                    6. In the instructions, be sure to also include instruction for how to make any ingredients (like syrups, teas, or infused ingredients).
+                    7. After generating the specs, description and instructions take the results and reformat them into this schema and return the JSON.
+                    8. Since this isn't an official recipe, make sure to include a tag: "LLM Guessed".
+                    9. Since this isn't an official recipe, the description should be more verbose and include your full analysis (including details on strong presences) of why you choose the recipe's spec.
+                    """
+
 additional_prompts = """Here are additional notes to consider during your reformating:
                     1. Validate all JSON outputs to include required fields (id, name, amount, and units) and replace missing values with defaults.
                     2. Do not convert units.  Use the units in the recipe.
@@ -24,7 +36,12 @@ json_prompt =   """Here is the JSON schema:
 recipe_prompt = """Here is the recipe text: 
                 """
 
+invent_prompt = """Here is the recipe description: 
+                """
+
 default_model = 'gemini-2.0-flash'
+
+all_models = ["gemini-2.0-flash", "gemini-2.5-pro-exp-03-25"]
 
 common_sources = ["Smuggler's Cove", "Death & Co.", "Tropical Standard", "Educated Barfly", "Reddit"]
 
